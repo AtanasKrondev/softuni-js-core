@@ -1,34 +1,33 @@
 function solve() {
-  let questionsSection = document.getElementsByTagName('section');
-  let wrongAnswers = Array.from(document.getElementsByClassName('low-value'));
-  let rightAnswers = Array.from(document.getElementsByClassName('high-value'));
-  let countQuestions = 0;
-  let countRight = 0;
+  let quizAnswers = Array.from(document.getElementsByTagName('p'));
+  let questions = Array.from(document.getElementsByTagName('section'));
+  let results = document.querySelector('.results-inner h1');
 
-  wrongAnswers.forEach(e => e.addEventListener('click', () => cicleQuestions()));
-  rightAnswers.forEach(e => e.addEventListener('click', () => { countRight++; cicleQuestions() }));
+  let currentQuestion = 0;
+  let rightAnswers = 0;
 
-  function cicleQuestions() {
-    questionsSection[countQuestions].className = 'hidden';
-    questionsSection[countQuestions].style.display = 'none';
-        
-    countQuestions++;
-    if (countQuestions < questionsSection.length) {
-      questionsSection[countQuestions].className = '';
-      questionsSection[countQuestions].style.display = 'block';
-    } else {
-      let resultElement = document.getElementsByClassName('results-inner')[0].children[0];
+  quizAnswers.forEach(question => question.addEventListener('click', selectAnswer))
 
-      if (countRight === 3) {
-        resultElement.textContent = 'You are recognized as top JavaScript fan!';
-      } else {
-        resultElement.textContent = `You have ${countRight} right answers`;
-      }
+  function selectAnswer(e) {
+    let answer = e.target.textContent;
 
-      let resultDisplay = document.querySelectorAll('#quizzie ul')[3];
-      resultDisplay.style.display = 'block';
+    if (answer === 'onclick' || answer === 'JSON.stringify()' || answer === 'A programming API for HTML and XML documents') {
+      rightAnswers++;
     }
 
-  }
+    questions[currentQuestion].style.display = 'none';
+    currentQuestion++;
 
+    if (currentQuestion < 3) {
+      questions[currentQuestion].style.display = 'block';
+    } else {
+      if (rightAnswers === 3) {
+        results.textContent = 'You are recognized as top JavaScript fan!';
+      } else {
+        results.textContent = `You have ${rightAnswers} right answers`;
+      }
+
+      document.getElementById('results').style.display = 'block';
+    }
+  }
 }
