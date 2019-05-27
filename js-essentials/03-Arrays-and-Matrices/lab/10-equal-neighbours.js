@@ -2,13 +2,12 @@ function solve(matrix) {
     let result = 0;
 
     for (let row = 1; row < matrix.length; row++) {
-        for (let col = 0; col < matrix[row].length - 1; col++) {
+        for (let col = 0; col < matrix[row].length; col++) {
             if (matrix[row][col] === matrix[row - 1][col]) {
                 result++;
             }
         }
     }
-
     for (let row = 0; row < matrix.length; row++) {
         for (let col = 1; col < matrix[row].length; col++) {
             if (matrix[row][col] === matrix[row][col - 1]) {
