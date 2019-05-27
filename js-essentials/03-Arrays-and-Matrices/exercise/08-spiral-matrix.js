@@ -11,7 +11,6 @@ function spiralMatrix(rows, cols) {
     let row = 0;
     let col = 0;
     let direction = 'right';
-    let start = 0;
 
     for (let i = 0; i < rows * cols; i++) {
         matrix[row][col] = counter;
