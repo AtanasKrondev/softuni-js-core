@@ -1,4 +1,12 @@
 function solve() {
+    let [key, text] = JSON.parse(document.getElementById('array').value);
+    let result = document.getElementById('result');
 
-    //TODO...
+    
+
+    function appendP(str) {
+        let p = document.createElement('p');
+        p.textContent = str;
+        result.appendChild(p);
+    }
 }
