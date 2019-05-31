@@ -2,17 +2,22 @@ function plasmaGiants(arr, n) {
     let firstArr = arr.slice(0, arr.length / 2);
     let secondArr = arr.slice(arr.length / 2, arr.length);
 
-    let firstGiant = createGiant(firstArr, n);
-    let secondGiant = createGiant(secondArr, n);
+    let firstMatrix = createMatrix(firstArr, n);
+    let secondMatrix = createMatrix(secondArr, n);
+
+    let firstGiant = buildGiant(firstMatrix);
+    let secondGiant = buildGiant(secondMatrix);
 
     let hit = Math.min(...arr);
-    let minHealth = Math.max(...arr);
+    let fatalHealth = Math.max(...arr);
     let rounds = 1;
 
-    while (firstGiant > minHealth && secondGiant > minHealth) {
-        rounds++;
-        firstGiant -= hit;
-        secondGiant -= hit;
+    if (hit !== 0) {
+        while (firstGiant > fatalHealth && secondGiant > fatalHealth) {
+            firstGiant -= hit;
+            secondGiant -= hit;
+            rounds++;
+        }
     }
 
     if (firstGiant > secondGiant) {
@@ -21,29 +26,29 @@ function plasmaGiants(arr, n) {
         console.log(`Second Giant defeated First Giant with result ${secondGiant} - ${firstGiant} in ${rounds} rounds`);
     } else if (firstGiant === secondGiant) {
         console.log(`Its a draw ${firstGiant} - ${secondGiant}`);
-
+    }
+    
+    function createMatrix(arr, n) {
+        if (n === 0) {
+            return [];
+        } else {
+            let matrix = [[]];
+            for (const el of arr) {
+                if (matrix[matrix.length - 1].length === n) {
+                    matrix.push([]);
+                }
+                matrix[matrix.length - 1].push(el);
+            }
+            return matrix;
+        }
     }
 
-
-    function createGiant(arr, n) {
-        let matrix = [[]];
-        let counter = 0;
-        for (let el of arr) {
-            if (counter === n) {
-                matrix.push([]);
-                counter = 0;
-            }
-            matrix[matrix.length - 1].push(el);
-            counter++;
-        }
-
-        let product = []
-
-        matrix.forEach(e => {
-            product.push(e.reduce((a, b) => a * b));
-        })
-
-        return product.reduce((a, b) => a + b);
+    function buildGiant(arr) {
+        let product = 0;
+        arr.forEach(element => {
+            product += element.reduce((a, b) => a * b);
+        });
+        return product;
     }
 }
 
