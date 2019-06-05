@@ -5,18 +5,20 @@ function coffeeStorage() {
 
     for (const command of inputElement) {
         if (command === 'REPORT') {
-            reportElement.innerHTML = inputElement.join('<br>');
+            // reportElement.innerHTML = storage.join('<br>');   
+            console.log(storage);
+                     
         } else if (command === 'INSPECTION') {
             inspectElement.textContent = 'makari';
         } else {
-            let [action, brand, coffee, expDate, qty] = command;
+            let [action, brand, coffee, expDate, qty] = command.split(', ');
             if (action === 'IN') {
                 if (!storage.hasOwnProperty(brand)) {
-                    storage[brand] = {}
+                    storage[brand] = {};
                 }
 
-                if (!storage[brand].hasOwnProperty(brand)) {
-                    
+                if (!storage[brand].hasOwnProperty(coffee)) {
+                    storage[brand][coffee] = { expDate, qty };
                 }
             } else if (action === 'OUT') {
 
