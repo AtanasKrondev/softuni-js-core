@@ -1,14 +1,29 @@
 (function (scope) {
-    const { Renderer, GameObjectsFactory } = scope;
+    const {
+        Renderer,
+        GameObjectsFactory,
+        SIZES,
+        KEY_CODES,
+    } = scope;
 
     const setupCanvas = function (gameContainer, width, height) {
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-
         gameContainer.appendChild(canvas);
         return canvas;
     };
+
+    class EventChecker {
+        isGoLeftEvent(ev) {
+            const { LEFT } = KEY_CODES;
+            return ev.keyCode === LEFT;
+        }
+        isGoRightEvent(ev) {
+            const { RIGHT } = KEY_CODES;
+            return ev.keyCode === RIGHT;
+        }
+    }
 
     class Game {
         constructor(selector, width, height) {
@@ -20,6 +35,7 @@
             };
             this.renderer = new Renderer(this.canvas, this.bounds);
             this.gameObjectsFactory = new GameObjectsFactory(width, height);
+            this.eventChecker = new EventChecker();
             this.player = this.gameObjectsFactory.createPlayer();
             this._attachGameEvents();
         }
@@ -33,10 +49,11 @@
             });
         }
         _handleMovement(ev) {
+            const { SPEED } = SIZES.PLAYER;
             let alpha = 0;
-            if (ev.keyCode === 37) {
+            if (this.eventChecker.isGoLeftEvent(ev)) {
                 alpha = -1;
-            } else if (ev.keyCode === 39) {
+            } else if (this.eventChecker.isGoRightEvent(ev)) {
                 alpha = +1;
             }
             this.player.left += alpha * 15;
