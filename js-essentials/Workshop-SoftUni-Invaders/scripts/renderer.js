@@ -1,4 +1,5 @@
 (function (scope) {
+    const { SIZES } = scope;
     class Renderer {
         constructor(canvas, bounds) {
             this.ctx = canvas.getContext('2d');
@@ -16,8 +17,9 @@
         }
         renderPlayer(left, top) {
             const { ctx } = this;
+            const { WIDTH, HEIGHT } = SIZES.PLAYER;
             if (this.playerImage) {
-                ctx.drawImage(this.playerImage, left, top, 60, 40);
+                ctx.drawImage(this.playerImage, left, top, WIDTH, HEIGHT);
             }
         }
 

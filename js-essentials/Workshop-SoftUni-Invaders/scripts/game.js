@@ -1,5 +1,5 @@
 (function (scope) {
-    const { Renderer } = scope;
+    const { Renderer, SIZES } = scope;
 
     const setupCanvas = function (gameContainer, width, height) {
         const canvas = document.createElement('canvas');
@@ -20,6 +20,9 @@
             };
 
             this.renderer = new Renderer(this.canvas, this.bounds);
+            const left = (width - SIZES.PLAYER.WIDTH) / 2;
+            const top = height - SIZES.PLAYER.HEIGHT;
+            this.player = { left, top };
 
         }
         start() {
@@ -27,7 +30,8 @@
         }
         _gameLoop() {
             this.renderer.clear();
-            this.renderer.renderPlayer(100, 150);
+            const { top, left } = this.player;
+            this.renderer.renderPlayer(left, top);
             window.requestAnimationFrame(() => {
                 this._gameLoop()
             });
