@@ -11,12 +11,12 @@
 
 <body>
     <div id="game-container"></div>
+    <script src="./scripts/renderer.js"></script>
     <script src="./scripts/game.js"></script>
     <script>
-        const { game } = window;
-        game
-            .init('#game-container', 1280, 620)
-            .start()
+        const { Game } = window;
+        const game = new Game('#game-container', 1280, 620)
+        game.start();
     </script>
 </body>
 
