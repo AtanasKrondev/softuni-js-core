@@ -1,5 +1,5 @@
 (function (scope) {
-    const { Renderer, SIZES } = scope;
+    const { Renderer, GameObjectsFactory } = scope;
 
     const setupCanvas = function (gameContainer, width, height) {
         const canvas = document.createElement('canvas');
@@ -18,15 +18,28 @@
                 width,
                 height,
             };
-
             this.renderer = new Renderer(this.canvas, this.bounds);
-            const left = (width - SIZES.PLAYER.WIDTH) / 2;
-            const top = height - SIZES.PLAYER.HEIGHT;
-            this.player = { left, top };
-
+            this.gameObjectsFactory = new GameObjectsFactory(width, height);
+            this.player = this.gameObjectsFactory.createPlayer();
+            this._attachGameEvents();
         }
         start() {
             this._gameLoop();
+        }
+        _attachGameEvents() {
+            window.addEventListener('keydown', (ev) => {
+                this._handleMovement(ev);
+                // this._handleFireEvent(ev);
+            });
+        }
+        _handleMovement(ev) {
+            let alpha = 0;
+            if (ev.keyCode === 37) {
+                alpha = -1;
+            } else if (ev.keyCode === 39) {
+                alpha = +1;
+            }
+            this.player.left += alpha * 15;
         }
         _gameLoop() {
             this.renderer.clear();
