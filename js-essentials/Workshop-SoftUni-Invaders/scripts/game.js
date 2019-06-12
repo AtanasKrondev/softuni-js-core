@@ -23,6 +23,10 @@
             const { RIGHT } = KEY_CODES;
             return ev.keyCode === RIGHT;
         }
+        isFireEvent(ev) {
+            const { FIRE } = KEY_CODES;            
+            return ev.keyCode === FIRE;
+        }
     }
 
     class Game {
@@ -45,8 +49,13 @@
         _attachGameEvents() {
             window.addEventListener('keydown', (ev) => {
                 this._handleMovement(ev);
-                // this._handleFireEvent(ev);
+                this._handleFireEvent(ev);
             });
+        }
+        _handleFireEvent(ev) {
+            if (!this.eventChecker.isFireEvent(ev)) {
+                return;
+            }
         }
         _handleMovement(ev) {
             const { SPEED } = SIZES.PLAYER;
