@@ -23,9 +23,16 @@
             }
         }
 
-        renderBullet(left, top) {
+        renderBullets(bullets) {
+            bullets.forEach(bullet => this.renderBullet(bullet));
+        }
+
+        renderBullet(bullet) {
+            const { left, top } = bullet;
             const { ctx } = this;
-            ctx.fillRect(left, top, 15, 15);
+            const { WIDTH, HEIGHT } = SIZES.BULLET;
+            ctx.fillStyle = 'red';
+            ctx.fillRect(left, top, WIDTH, HEIGHT);
         }
 
         renderEnemy(left, top) {

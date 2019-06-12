@@ -1,9 +1,14 @@
 (function (scope) {
     const SIZES = {
         PLAYER: {
-            WIDTH: 160,
             HEIGHT: 140,
+            WIDTH: 160,
             SPEED: 15,
+        },
+        BULLET: {
+            HEIGHT: 50,
+            WIDTH: 30,
+            SPEED: -5,
         },
     };
 

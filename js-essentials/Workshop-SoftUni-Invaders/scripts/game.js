@@ -24,7 +24,7 @@
             return ev.keyCode === RIGHT;
         }
         isFireEvent(ev) {
-            const { FIRE } = KEY_CODES;            
+            const { FIRE } = KEY_CODES;
             return ev.keyCode === FIRE;
         }
     }
@@ -41,22 +41,28 @@
             this.gameObjectsFactory = new GameObjectsFactory(width, height);
             this.eventChecker = new EventChecker();
             this.player = this.gameObjectsFactory.createPlayer();
+            this.bullets = [];
             this._attachGameEvents();
-        }
+        };
         start() {
             this._gameLoop();
-        }
+        };
         _attachGameEvents() {
             window.addEventListener('keydown', (ev) => {
                 this._handleMovement(ev);
                 this._handleFireEvent(ev);
             });
-        }
+        };
         _handleFireEvent(ev) {
             if (!this.eventChecker.isFireEvent(ev)) {
                 return;
             }
-        }
+            const { top, left } = this.player;
+            const leftBullet = this.gameObjectsFactory.createBullet(top, left);
+            const leftOfRightBullet = left + SIZES.PLAYER.WIDTH - SIZES.BULLET.WIDTH;
+            const rightBullet = this.gameObjectsFactory.createBullet(top, leftOfRightBullet);
+            this.bullets.push(leftBullet, rightBullet);
+        };
         _handleMovement(ev) {
             const { SPEED } = SIZES.PLAYER;
             let alpha = 0;
@@ -66,11 +72,22 @@
                 alpha = +1;
             }
             this.player.left += alpha * 15;
-        }
-        _gameLoop() {
-            this.renderer.clear();
+        };
+        _render() {
             const { top, left } = this.player;
             this.renderer.renderPlayer(left, top);
+            this.renderer.renderBullets(this.bullets);
+        };
+        _updatePositions() {
+            const { SPEED } = SIZES.BULLET;
+            this.bullets.forEach(bullet => {
+                bullet.top += SPEED;
+            });
+        };
+        _gameLoop() {
+            this.renderer.clear();
+            this._render();
+            this._updatePositions();
             window.requestAnimationFrame(() => {
                 this._gameLoop()
             });

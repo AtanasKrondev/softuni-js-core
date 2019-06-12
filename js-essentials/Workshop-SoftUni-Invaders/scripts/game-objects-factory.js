@@ -13,6 +13,11 @@
 
             return player;
         }
+
+        createBullet(top, left) {
+            const bullet = { top, left };
+            return bullet;
+        }
     }
 
     scope.GameObjectsFactory = GameObjectsFactory;
