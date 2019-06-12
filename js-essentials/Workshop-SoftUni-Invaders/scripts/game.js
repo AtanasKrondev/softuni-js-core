@@ -64,14 +64,16 @@
             this.bullets.push(leftBullet, rightBullet);
         };
         _handleMovement(ev) {
-            const { SPEED } = SIZES.PLAYER;
+            const { SPEED, WIDTH } = SIZES.PLAYER;
             let alpha = 0;
             if (this.eventChecker.isGoLeftEvent(ev)) {
                 alpha = -1;
             } else if (this.eventChecker.isGoRightEvent(ev)) {
                 alpha = +1;
             }
-            this.player.left += alpha * 15;
+            this.player.left += alpha * SPEED;
+            this.player.left = Math.max(this.player.left, 0);
+            this.player.left = Math.min(this.player.left, this.bounds.width - WIDTH);
         };
         _render() {
             const { top, left } = this.player;
@@ -82,12 +84,17 @@
             const { SPEED } = SIZES.BULLET;
             this.bullets.forEach(bullet => {
                 bullet.top += SPEED;
+                bullet.isDead = bullet.top <= 0;
             });
         };
+        _removeDeadGameObjects() {
+            this.bullets = this.bullets.filter(bullet => !bullet.isDead);
+        }
         _gameLoop() {
             this.renderer.clear();
             this._render();
             this._updatePositions();
+            this._removeDeadGameObjects();
             window.requestAnimationFrame(() => {
                 this._gameLoop()
             });
