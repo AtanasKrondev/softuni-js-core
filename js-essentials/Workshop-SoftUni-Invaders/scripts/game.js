@@ -14,6 +14,20 @@
         return canvas;
     };
 
+    const trueOrFalse = (chance) => {
+        const value = Math.random() * 100;
+        return value <= chance;
+    }
+
+    const getCollisionBox = (position, bounds) => {
+        return {
+            left: position.left,
+            top: position.top,
+            right: position.left + bounds.width,
+            bottom: position.top + bounds.height,
+        }
+    }
+
     class EventChecker {
         isGoLeftEvent(ev) {
             const { LEFT } = KEY_CODES;
@@ -42,6 +56,7 @@
             this.eventChecker = new EventChecker();
             this.player = this.gameObjectsFactory.createPlayer();
             this.bullets = [];
+            this.enemies = [];
             this._attachGameEvents();
         };
         start() {
@@ -51,6 +66,9 @@
             window.addEventListener('keydown', (ev) => {
                 this._handleMovement(ev);
                 this._handleFireEvent(ev);
+            });
+            window.addEventListener('keyup', (ev) => {
+                this.player.direction = null;
             });
         };
         _handleFireEvent(ev) {
@@ -68,8 +86,10 @@
             let alpha = 0;
             if (this.eventChecker.isGoLeftEvent(ev)) {
                 alpha = -1;
+                this.player.direction = 'left';
             } else if (this.eventChecker.isGoRightEvent(ev)) {
                 alpha = +1;
+                this.player.direction = 'right';
             }
             this.player.left += alpha * SPEED;
             this.player.left = Math.max(this.player.left, 0);
@@ -77,23 +97,82 @@
         };
         _render() {
             const { top, left } = this.player;
-            this.renderer.renderPlayer(left, top);
+            this.renderer.renderPlayer(this.player);
             this.renderer.renderBullets(this.bullets);
+            this.renderer.renderEnemies(this.enemies);
         };
         _updatePositions() {
-            const { SPEED } = SIZES.BULLET;
+            const { SPEED: bulletSpeed } = SIZES.BULLET;
+            const { SPEED: enemytSpeed } = SIZES.ENEMY;
+            const { height } = this.bounds;
             this.bullets.forEach(bullet => {
-                bullet.top += SPEED;
+                bullet.top += bulletSpeed;
                 bullet.isDead = bullet.top <= 0;
+            });
+            this.enemies.forEach(enemy => {
+                enemy.top += enemytSpeed;
+                enemy.isDead = enemy.top >= height;
             });
         };
         _removeDeadGameObjects() {
             this.bullets = this.bullets.filter(bullet => !bullet.isDead);
+            this.enemies = this.enemies.filter(enemy => !enemy.isDead);
+        }
+        _createNewGameObjects() {
+            if (trueOrFalse(5)) {
+                const enemy = this.gameObjectsFactory.createEnemy();
+                this.enemies.push(enemy);
+            }
+        }
+        _checkForBulletsWithEnemiesCollisions() {
+            const { bullets, enemies } = this;
+            bullets.forEach(bullet => {
+                const bulletCollisionBox = getCollisionBox(bullet, SIZES.BULLET);
+                enemies.forEach(enemy => {
+                    const enemyCollisionBox = getCollisionBox(enemy, SIZES.ENEMY);
+                    const hasHorizontalCollision =
+                        (
+                            bulletCollisionBox.left <= enemyCollisionBox.left &&
+                            enemyCollisionBox.left <= bulletCollisionBox.right
+                        ) || (
+                            bulletCollisionBox.left <= enemyCollisionBox.right &&
+                            enemyCollisionBox.right <= bulletCollisionBox.right
+                        ) || (
+                            enemyCollisionBox.left <= bulletCollisionBox.left &&
+                            bulletCollisionBox.left <= enemyCollisionBox.right
+                        ) || (
+                            enemyCollisionBox.left <= bulletCollisionBox.right &&
+                            bulletCollisionBox.right <= enemyCollisionBox.right
+                        )
+                    const hasVerticalCollision =
+                        (
+                            bulletCollisionBox.top <= enemyCollisionBox.top &&
+                            enemyCollisionBox.top <= bulletCollisionBox.bottom
+                        ) || (
+                            bulletCollisionBox.top <= enemyCollisionBox.bottom &&
+                            enemyCollisionBox.bottom <= bulletCollisionBox.bottom
+                        ) || (
+                            enemyCollisionBox.top <= bulletCollisionBox.top &&
+                            bulletCollisionBox.top <= enemyCollisionBox.bottom
+                        ) || (
+                            enemyCollisionBox.top <= bulletCollisionBox.bottom &&
+                            bulletCollisionBox.bottom <= enemyCollisionBox.bottom
+                        )
+                    bullet.isDead == hasVerticalCollision && hasHorizontalCollision;
+                    enemy.isDead == hasVerticalCollision && hasHorizontalCollision;
+                })
+            })
+        }
+        _checkForCollisions() {
+            //playerWithEnemy
+            this._checkForBulletsWithEnemiesCollisions()
         }
         _gameLoop() {
             this.renderer.clear();
             this._render();
             this._updatePositions();
+            this._createNewGameObjects();
+            this._checkForCollisions();
             this._removeDeadGameObjects();
             window.requestAnimationFrame(() => {
                 this._gameLoop()
