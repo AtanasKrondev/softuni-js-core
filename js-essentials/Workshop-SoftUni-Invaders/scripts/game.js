@@ -4,6 +4,7 @@
         GameObjectsFactory,
         SIZES,
         KEY_CODES,
+        CollisionDetector,
     } = scope;
 
     const setupCanvas = function (gameContainer, width, height) {
@@ -19,14 +20,12 @@
         return value <= chance;
     }
 
-    const getCollisionBox = (position, bounds) => {
-        return {
-            left: position.left,
-            top: position.top,
-            right: position.left + bounds.width,
-            bottom: position.top + bounds.height,
-        }
-    }
+    const getCollisionBox = ({ left, top }, { WIDTH, HEIGHT }) => ({
+        left,
+        top,
+        right: left + WIDTH,
+        bottom: top + HEIGHT,
+    });
 
     class EventChecker {
         isGoLeftEvent(ev) {
@@ -54,11 +53,12 @@
             this.renderer = new Renderer(this.canvas, this.bounds);
             this.gameObjectsFactory = new GameObjectsFactory(width, height);
             this.eventChecker = new EventChecker();
+            this.collisionDetector = new CollisionDetector();
             this.player = this.gameObjectsFactory.createPlayer();
             this.bullets = [];
             this.enemies = [];
             this._attachGameEvents();
-        };
+        }
         start() {
             this._gameLoop();
         };
@@ -129,43 +129,24 @@
             bullets.forEach(bullet => {
                 const bulletCollisionBox = getCollisionBox(bullet, SIZES.BULLET);
                 enemies.forEach(enemy => {
+                    if (bullet.isDead || enemy.isDead) {
+                        return;
+                    }
+
                     const enemyCollisionBox = getCollisionBox(enemy, SIZES.ENEMY);
-                    const hasHorizontalCollision =
-                        (
-                            bulletCollisionBox.left <= enemyCollisionBox.left &&
-                            enemyCollisionBox.left <= bulletCollisionBox.right
-                        ) || (
-                            bulletCollisionBox.left <= enemyCollisionBox.right &&
-                            enemyCollisionBox.right <= bulletCollisionBox.right
-                        ) || (
-                            enemyCollisionBox.left <= bulletCollisionBox.left &&
-                            bulletCollisionBox.left <= enemyCollisionBox.right
-                        ) || (
-                            enemyCollisionBox.left <= bulletCollisionBox.right &&
-                            bulletCollisionBox.right <= enemyCollisionBox.right
-                        )
-                    const hasVerticalCollision =
-                        (
-                            bulletCollisionBox.top <= enemyCollisionBox.top &&
-                            enemyCollisionBox.top <= bulletCollisionBox.bottom
-                        ) || (
-                            bulletCollisionBox.top <= enemyCollisionBox.bottom &&
-                            enemyCollisionBox.bottom <= bulletCollisionBox.bottom
-                        ) || (
-                            enemyCollisionBox.top <= bulletCollisionBox.top &&
-                            bulletCollisionBox.top <= enemyCollisionBox.bottom
-                        ) || (
-                            enemyCollisionBox.top <= bulletCollisionBox.bottom &&
-                            bulletCollisionBox.bottom <= enemyCollisionBox.bottom
-                        )
-                    bullet.isDead == hasVerticalCollision && hasHorizontalCollision;
-                    enemy.isDead == hasVerticalCollision && hasHorizontalCollision;
-                })
-            })
+                    const hasCollision = this.collisionDetector.checkForCollision(bulletCollisionBox, enemyCollisionBox);
+                    bullet.isDead = hasCollision;
+                    enemy.isDead = hasCollision;
+                });
+            });
         }
         _checkForCollisions() {
             //playerWithEnemy
             this._checkForBulletsWithEnemiesCollisions()
+        }
+        _removeDeadGameObjects() {
+            this.bullets = this.bullets.filter(bullet => !bullet.isDead);
+            this.enemies = this.enemies.filter(enemy => !enemy.isDead);
         }
         _gameLoop() {
             this.renderer.clear();
