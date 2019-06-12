@@ -4,10 +4,16 @@
         constructor(canvas, bounds) {
             this.ctx = canvas.getContext('2d');
             this.bounds = bounds;
-            const image = new Image();
-            image.src = './images/batwing.png';
-            image.onload = () => {
-                this.playerImage = image;
+            const playerImage = new Image();
+            playerImage.src = './images/batwing.png';
+            playerImage.onload = () => {
+                this.playerImage = playerImage;
+            };
+
+            const bulletImage = new Image();
+            bulletImage.src = './images/rocket.png';
+            bulletImage.onload = () => {
+                this.bulletImage = bulletImage;
             };
         }
         clear() {
@@ -31,8 +37,9 @@
             const { left, top } = bullet;
             const { ctx } = this;
             const { WIDTH, HEIGHT } = SIZES.BULLET;
-            ctx.fillStyle = 'red';
-            ctx.fillRect(left, top, WIDTH, HEIGHT);
+            if (this.bulletImage) {
+                ctx.drawImage(this.bulletImage, left, top, WIDTH, HEIGHT);
+            }
         }
 
         renderEnemy(left, top) {
