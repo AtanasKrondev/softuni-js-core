@@ -25,79 +25,53 @@ class Kitchen {
             }
         });
 
-        let actionsLogString = actionsLog.join('\n');
-        this.actionsHistory.push(actionsLogString);
-        return actionsLogString;
+        this.actionsHistory = [...this.actionsHistory, ...actionsLog]
+        return this.actionsHistory.join('\n');
     }
 
     addToMenu(meal, neededProducts, price) {
         if (this.menu.hasOwnProperty(meal)) {
-            let actionsLogString = `The ${meal} is already in our menu, try something different.`;
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
+            return `The ${meal} is already in our menu, try something different.`;
         } else {
-            this.menu[meal] = {};
-            this.menu[meal]['ingredients'] = {};
-            neededProducts.forEach(product => {
-                let productArr = product.split(' ');
-                const productQuantity = +productArr.pop();
-                const productName = productArr.join(' ');
-                this.menu[meal]['ingredients'][productName] = +productQuantity;
-            });
-            this.menu[meal]['price'] = +price;
-            let actionsLogString = `Great idea! Now with the ${meal} we have ${Object.keys(this.menu).length} meals in the menu, other ideas?`;
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
+            this.menu[meal] = {
+                products: neededProducts,
+                price: +price
+            }
+            return `Great idea! Now with the ${meal} we have ${Object.keys(this.menu).length} meals on the menu, other ideas?`
         }
     }
 
     showTheMenu() {
-        let menuArr = Object.entries(this.menu);
-        if (menuArr.length === 0) {
-            let actionsLogString = 'Our menu is not ready yet, please come later...';
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
-        } else {
-            let actionsLog = [];
-            menuArr.forEach(meal => {
-                actionsLog.push(`${meal[0]} - $ ${meal[1].price}`);
-            })
-            let actionsLogString = actionsLog.join('\n');
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
+        let toPrint = [];
+        for (let key of Object.keys(this.menu)) {
+            toPrint.push(`${key} - $ ${this.menu[key].price}`);
         }
+        if (!toPrint.length) return ('Our menu is not ready yet, please come later...');
+        else {
+            return toPrint.join('\n') + '\n';
+        };
     }
 
     makeTheOrder(meal) {
-        if (!this.menu.hasOwnProperty(meal)) {
-            let actionsLogString = `There is not ${meal} yet in our menu, do you want to order something else?`;
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
-        } else {
-            for (const ingredient in this.menu[meal].ingredients) {
-                if (!this.productsInStock.hasOwnProperty(ingredient)) {
-                    let actionsLogString = `For the time being, we cannot complete your order (${meal}), we are very sorry...`;
-                    this.actionsHistory.push(actionsLogString);
-                    return actionsLogString;
-                }
+        if (!this.menu[meal]) return (`There is not ${meal} yet in our menu, do you want to order something else?`)
+        //check for products          
+        let ingredientsNeeded = this.menu[meal].products
+        for (let item of ingredientsNeeded) {
+            item = item.split(' ')
+            let quantity = +item.pop()
+            let product = item.join(' ')
+            if (this.productsInStock[product] < quantity || !this.productsInStock[product]) {
+                return (`For the time being, we cannot complete your order (${meal}), we are very sorry...`) // test 15
             }
-
-            for (const ingredient in this.menu[meal].ingredients) {
-                if (this.productsInStock[ingredient] < this.menu[meal].ingredients[ingredient]) {
-                    let actionsLogString = `For the time being, we cannot complete your order (${meal}), we are very sorry...`;
-                    this.actionsHistory.push(actionsLogString);
-                    return actionsLogString;
-                }
-            }
-
-            for (const ingredient in this.menu[meal].ingredients) {
-                this.productsInStock[ingredient] -= this.menu[meal].ingredients[ingredient];
-            }
-
-            let actionsLogString = `Your order (${meal}) will be completed in the next 30 minutes and will cost you ${this.menu[meal].price}.`;
-            this.actionsHistory.push(actionsLogString);
-            return actionsLogString;
         }
+
+        for (let item of ingredientsNeeded) {
+            item = item.split(' ')
+            let quantity = +item.pop()
+            let product = item.join(' ')
+            this.productsInStock[product] -= quantity
+        } this.budget += this.menu[meal].price
+        return (`Your order (${meal}) will be completed in the next 30 minutes and will cost you ${this.menu[meal].price}.`) //test 13 pass
     }
 }
 

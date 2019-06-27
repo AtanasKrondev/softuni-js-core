@@ -1,138 +1,91 @@
 const PaymentPackage = require('./PaymentPackage.js')
 const { expect } = require('chai');
 
-describe('String building tests', function () {
-    let sb;
-    beforeEach(function () {
-        sb = new StringBuilder();
+describe('Payment Package testing', function () {
+    let object;
+
+    it('Should initiate with valid name', function () {
+        let invalidName = () => object = new PaymentPackage({});
+        expect(invalidName).to.throw(Error, 'Name must be a non-empty string');
+        let emptyName = () => object = new PaymentPackage('');
+        expect(emptyName).to.throw(Error, 'Name must be a non-empty string');
+    })
+
+    it('Should initiate with valid value', function () {
+        let emptyValue = () => object = new PaymentPackage('HR Services');
+        expect(emptyValue).to.throw(Error, 'Value must be a non-negative number');
+        let negativeValue = () => object = new PaymentPackage('HR Services', -20);
+        expect(negativeValue).to.throw(Error, 'Value must be a non-negative number');
     });
 
-    describe('Constructor tests', function () {
-        it('checks if funcs are attached to proto', function () {
-            expect(typeof StringBuilder.prototype.append === 'function').to.be.true;
-            expect(typeof StringBuilder.prototype.prepend === 'function').to.be.true;
-            expect(typeof StringBuilder.prototype.insertAt === 'function').to.be.true;
-            expect(typeof StringBuilder.prototype.remove === 'function').to.be.true;
-            expect(typeof StringBuilder.prototype.toString === 'function').to.be.true;
+    describe('Initiate all properties and functions', function () {
+        beforeEach(function () {
+            object = new PaymentPackage('HR Services', 1500);
+        });
+
+        it('Should has all properties', function () {
+            expect(object.hasOwnProperty('_name')).to.equal(true);
+            expect(object.hasOwnProperty('_value')).to.equal(true);
+            expect(object.hasOwnProperty('_VAT')).to.equal(true);
+            expect(object.hasOwnProperty('_active')).to.equal(true);
+        });
+
+        it('Should has functions to proto', function () {
+            expect(Object.getPrototypeOf(object).hasOwnProperty('toString')).to.equal(true)
         })
-        it('is initialized with wrong params throw error', function () {
-            expect(() => new StringBuilder({})).to.throw(TypeError);
-        })
-
-        it('is initialized without params', function () {
-            expect(sb._stringArray.join('')).to.equal('', 'Empty string expected');
-        });
-
-        it('is initialized with params', function () {
-            sb = new StringBuilder('test');
-            const expected = 'test';
-            expect(sb._stringArray.join('')).to.equal(expected, 'Wrong construct');
-        })
-    })
-
-    describe('Prepend tests', function () {
-        it('is initialized with wrong param', function () {
-            const errorFunc = () => {
-                sb.prepend({ name: 'Pesho' });
-            }
-
-            expect(errorFunc).to.throw(TypeError);
-        });
-
-        it('is initialized with correct data', function () {
-            sb.prepend('Test');
-            const expected = 'Test';
-            expect(sb._stringArray.join('')).to.equal(expected, 'Wrong prepend');
-        });
-
-        it('is initialized with multiple correct data', function () {
-            sb.prepend('the other side');
-            sb.prepend('from ');
-            sb.prepend('Hello ');
-            const expected = 'Hello from the other side';
-            expect(sb._stringArray.join('')).to.equal(expected, 'Wrong prepend');
-        });
-    })
-
-    describe('Append tests', function () {
-        it('is initialized with wrong param', function () {
-            const errorFunc = () => {
-                sb.append({ name: 'Pesho' });
-            }
-
-            expect(errorFunc).to.throw(TypeError);
-        });
-
-        it('is initialized with correct data', function () {
-            sb.append('Test');
-            const expected = 'Test';
-            expect(sb._stringArray.join('')).to.equal(expected, 'Wrong append');
-        });
-
-        it('is initialized with multiple correct data', function () {
-            sb.append('Hello ');
-            sb.append('from ');
-            sb.append('the other side');
-            const expected = 'Hello from the other side';
-            expect(sb._stringArray.join('')).to.equal(expected, 'Wrong append');
-        });
-    })
-
-    describe('Insert at test', function () {
-        it('works correctly', function () {
-            const expected = 'Hello from the other side';
-            sb.prepend('the other side');
-            sb.prepend('Hello ');
-            sb.insertAt('from ', 6);
-            expect(sb.toString()).to.equal(expected, `Expected ${expected}`);
-        });
-        it('insert at beginning', function () {
-            const expected = 'Hello from the other side';
-            sb.prepend('the other side');
-            sb.prepend('from ');
-            sb.insertAt('Hello ', 0);
-            expect(sb.toString()).to.equal(expected, `Expected ${expected}`);
-        });
-        it('insert at the end', function () {
-            const expected = 'Hello from the other side';
-            sb.prepend('the other ');
-            sb.prepend('from ');
-            sb.prepend('Hello ');
-            sb.insertAt('side', sb.toString().length)
-            expect(sb.toString()).to.equal(expected, `Expected ${expected}`);
-        });
-        it('tested with wrong parameter', function () {
-            const errorFunc = () => {
-                sb.insertAt({});
-            }
-            expect(errorFunc).to.throw(TypeError);
-        });
-        it('inserts correctly', function () {
-            let str = 'kek';
-            builder.insertAt(str, 3);
-            let expected = Array.from(startingString);
-            expected.splice(3, 0, ...str);
-            compareArray(builder._stringArray, expected);
-        });
     });
 
-    describe('Remove test', function () {
-        it('works correctly', function () {
-            const expected = 'Hello from the other side';
-            sb.prepend('the other side');
-            sb.prepend('from ');
-            sb.prepend('Hello ');
-            sb.prepend('12345');
-            sb.remove(0, 5)
-            expect(sb.toString()).to.equal(expected, `Expected ${expected}`);
+    describe('Check accessors', function () {
+        beforeEach(function () {
+            object = new PaymentPackage('HR Services', 1500);
         });
-    });
 
-    describe('to string tests', function () {
-        it('test ToString', function () {
-            sb.prepend('Test');
+        it('Should update correctly', function () {
+            let wrongName = () => object.name = null;
+            expect(wrongName).to.throw(Error, 'Name must be a non-empty string');
+            let wrongValue = () => object.value = null;
+            expect(wrongValue).to.throw(Error, 'Value must be a non-negative number');
+            let wrongVAT = () => object.VAT = null;
+            expect(wrongVAT).to.throw(Error, 'VAT must be a non-negative number');
+            let wrongActive = () => object.active = null;
+            expect(wrongActive).to.throw(Error, 'Active status must be a boolean');
+        })
 
-            expect(sb.toString()).to.equal('Test', 'Doesnt work');
+        it('Should update active correctly', function () {
+            object.name = 'Gosho';
+            object.value = 38;
+            object.VAT = 39
+            object.active = false;
+            expect(object._name).to.equal('Gosho');
+            expect(object._value).to.equal(38);
+            expect(object._VAT).to.equal(39);
+            expect(object._active).to.equal(false);
         })
     })
-})
+});
+
+
+// let package = new PaymentPackage('HR Services', 1500)
+// console.log(package);
+// console.log(package.toString());
+
+// Should throw an error
+// try {
+//     const hrPack = new PaymentPackage('HR Services');
+// } catch(err) {
+//     console.log('Error: ' + err.message);
+// }
+// const packages = [
+//     new PaymentPackage('HR Services', 1500),
+//     new PaymentPackage('Consultation', 800),
+//     new PaymentPackage('Partnership Fee', 7000),
+// ];
+// console.log(packages.join('\n'));
+
+// const wrongPack = new PaymentPackage('Transfer Fee', 100);
+// // Should throw an error
+// try {
+//     wrongPack.active = null;
+// } catch(err) {
+//     console.log('Error: ' + err.message);
+// }
