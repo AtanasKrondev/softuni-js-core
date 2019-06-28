@@ -1,5 +1,13 @@
-function solve(selector){
-    //TODO...
+function solve(selector) {
+    let element = document.querySelector(selector);
+
+    (function changeClass(element) {
+        if (element.hasChildNodes()) {
+            element.className += ' highlight';
+            changeClass([...element.childNodes]
+                .sort((a, b) => b.childNodes.length - a.childNodes.length)[0]);
+        }
+    }(element));
 }
 
-// solve('#content'); <-- Try it.
+solve('#content');
