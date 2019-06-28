@@ -1,8 +1,14 @@
-function extensibleObj(obj, template) {
-    let result = Object.create(obj);
-    console.log(Object.getPrototypeOf(result));
-
-
+function solve() {
+    return {
+        extend: function (template) {
+            const entries = Object.entries(template);
+            for (const [key, value] of entries) {
+                if (typeof value === 'function') {
+                    Object.getPrototypeOf(this)[key] = value;
+                } else {
+                    this[key] = value;
+                }
+            }
+        }
+    }
 }
-
-extensibleObj({ a: 1 }, 0);
