@@ -1,43 +1,34 @@
 function solve(input) {
-    let cars = [];
+    let cars = {};
 
     for (const line of input) {
-        const commandLine = line.split(' ');
-        const command = commandLine[0];
-
+        const [command, ...params] = line.split(' ');
         switch (command) {
-            case 'create':
-                const newName = commandLine[1];
-                const newObj = {};
-                if (commandLine[2] === undefined) {
-                    newObj[newName] = {};
-                } else {
-                    const parrentCar = commandLine[3]
-                    newObj[newName] = Object.create(cars.find(c => c[parrentCar]));
-                }
-                cars.push(newObj);
-                break;
-            case 'set':
-                const updateCar = commandLine[1];
-                const key = commandLine[2];
-                const value = commandLine[3];
-                cars.find(c => c[updateCar])[updateCar][key] = value;
-                break;
-            case 'print':
-                const printCar = commandLine[1];
-                let printCarObj = cars.find(c => c[printCar])[printCar];
-                for (const key in printCarObj) {
-                    console.log(key);
-                    console.log(printCarObj[key]);
-                    
-                }
-                // console.log(Object.values(Object.getPrototypeOf(printCarObj)));
-
-
-                break;
+            case 'create': create(...params); break;
+            case 'set': set(...params); break;
+            case 'print': print(...params); break;
         }
     }
-    console.log(cars);
+
+    function create(name, inherit, parentName) {
+        if (inherit === 'inherit') {
+            cars[name] = Object.create(cars[parentName]);
+        } else {
+            cars[name] = {};
+        }
+    }
+
+    function set(name, key, value) {
+        cars[name][key] = value;
+    }
+
+    function print(name) {
+        let printArr = []
+        for (const key in cars[name]) {
+            printArr.push(`${key}:${cars[name][key]}`);
+        }
+        console.log(printArr.join(', '));
+    }
 }
 
 solve(['create c1',
