@@ -1,99 +1,109 @@
 const { expect } = require('chai');
-const SoftUniFy = require('./03. Softunify');
+const FilmStudio = require('./filmStudio');
 
-describe('SoftUniFy', function () {
-    describe('Has constructor and initializes', function () {
-        it('allSongs', function () {
-            let player = new SoftUniFy();
-            expect(player.allSongs).to.be.an('object');
-        });
-        it('allSongs', function () {
-            let player = new SoftUniFy();
-            expect(player.allSongs).to.eql({});
-        });
-        it('allSongs', function () {
-            let player = new SoftUniFy();
-            expect(player).to.be.an.instanceOf(SoftUniFy);
-        });
-    });
-    describe('downloadSongs', function () {
-        it('downloads a song', function () {
-            let player = new SoftUniFy();
-            player.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            expect(player.allSongs.hasOwnProperty('Eminem')).to.equal(true);
-            expect(player.allSongs['Eminem']).to.eql({ rate: 0, votes: 0, songs: ['Venom - Knock, Knock let the devil in...'] });
-        });
-        it('downloads multiple songs', function () {
-            let player = new SoftUniFy();
-            player.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            player.downloadSong('Eminem', 'Phenomenal', 'IM PHENOMENAL...');
-            player.downloadSong('Dub Fx', 'Light Me On Fire', 'You can call me a liar.. ');
-            expect(Object.keys(player.allSongs).length).to.equal(2);
-            expect(player.allSongs['Eminem']).to.eql({ rate: 0, votes: 0, songs: ['Venom - Knock, Knock let the devil in...', 'Phenomenal - IM PHENOMENAL...'] });
+describe('FilmStudio', () => {
 
+    it('constructs', () => {
+        let filmStudio = new FilmStudio('SU-Studio');
+        expect(filmStudio).to.be.an.instanceOf(FilmStudio);
+        expect(filmStudio.name).to.be.equal('SU-Studio');
+        expect(filmStudio.films).to.be.eql([]);
+    })
+
+    describe('makeMovie', () => {
+        it('invalid parameters', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            let wrongTypes = () => filmStudio.makeMovie(3, 'array');
+            expect(wrongTypes).to.throw('Invalid arguments');
+        })
+        it('only one parameter', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            let singleParameter = () => filmStudio.makeMovie('movie name');
+            expect(singleParameter).to.throw('Invalid arguments count');
+        })
+        it('makes movie', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            let film = filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            expect(film).to.eql({
+                filmName: 'The Avengers',
+                filmRoles:
+                    [{ role: 'Iron-Man', actor: false },
+                    { role: 'Thor', actor: false },
+                    { role: 'Hulk', actor: false },
+                    { role: 'Arrow guy', actor: false }]
+            });
+            let filmName = filmStudio.films[0].filmName;
+            let rolesArray = filmStudio.films[0].filmRoles.length;
+            expect(filmName).to.equal('The Avengers');
+            expect(rolesArray).to.equal(4);
+        })
+        it('makes sequel', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            let sequel = filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Hulk', 'Arrow guy', 'Ant-man']);
+            expect(sequel.filmName).to.equal('The Avengers 2');
+            expect(filmStudio.films.length).to.equal(2);
         })
     })
-    describe('playSongs', function () {
-        it('plays empty', function () {
-            let player = new SoftUniFy();
-            let song = 'tralala'
-            let empty = player.playSong(song);
-            expect(empty).to.equal(`You have not downloaded a ${song} song yet. Use SoftUniFy's function downloadSong() to change that!`)
+
+    describe('casting', () => {
+        it('empty films list', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            let emptyStudio = filmStudio.casting('Pesho', 'The big boss');
+            expect(emptyStudio).to.equal(`There are no films yet in ${filmStudio.name}.`)
         });
-        it('plays a song', function () {
-            let player = new SoftUniFy();
-            player.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            player.downloadSong('Eminem', 'Phenomenal', 'IM PHENOMENAL...');
-            player.downloadSong('Dub Fx', 'Light Me On Fire', 'You can call me a liar.. ');
-            let song = player.playSong('Phenomenal');
-            expect(song).to.equal('Eminem:\nPhenomenal - IM PHENOMENAL...\n');
+        it('can not find the role', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            let actor = 'Leo DiCaprio';
+            let role = 'Pikachu';
+            let missingRole = filmStudio.casting(actor, role);
+            expect(missingRole).to.equal(`${actor}, we cannot find a ${role} role...`)
+        })
+        it('tales the role', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            let actor = 'RDJ';
+            let role = 'Iron-Man';
+            let roleTaken = filmStudio.casting(actor, role);
+            expect(roleTaken).to.equal(`You got the job! Mr. ${actor} you are next ${role} in the The Avengers. Congratz!`);
+            expect(filmStudio.films[0].filmRoles).to.deep.include({ role: 'Iron-Man', actor: 'RDJ' });
         })
     })
-    describe('songList', function () {
-        it('empty songlist', function () {
-            let player = new SoftUniFy();
-            let output = player.songsList;
-            expect(output).to.equal('Your song list is empty')
-        })
-        it('returns songlist', function () {
-            let player = new SoftUniFy();
-            player.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            player.downloadSong('Eminem', 'Phenomenal', 'IM PHENOMENAL...');
-            player.downloadSong('Dub Fx', 'Light Me On Fire', 'You can call me a liar.. ');
-            let songslist = player.songsList;
-            expect(songslist).to.equal('Venom - Knock, Knock let the devil in...\nPhenomenal - IM PHENOMENAL...\nLight Me On Fire - You can call me a liar.. ')
-        })
-    })
-    describe('rateArtist', function () {
-        it('artist not found', function () {
-            let player = new SoftUniFy();
-            let empty1 = player.rateArtist('Gosho');
-            let empty2 = player.rateArtist('Pesho', 3000);
-            expect(empty1).to.equal(`The Gosho is not on your artist list.`);
-            expect(empty2).to.equal(`The Pesho is not on your artist list.`);
+
+    describe('lookForProducer', () => {
+        it('throws error', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            let film = 'The Scavengers';
+            let errorMessage = () => filmStudio.lookForProducer(film);
+            expect(errorMessage).to.throw(Error, `${film} do not exist yet, but we need the money...`)
         });
-        it('zero rate', function () {
-            let sofunify = new SoftUniFy();
-            sofunify.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            let zeroRate = sofunify.rateArtist('Eminem');
-            expect(zeroRate).to.equal(0);
-        })
-        it('NaN rate', function () {
-            let sofunify = new SoftUniFy();
-            sofunify.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            sofunify.rateArtist('Eminem');
-            sofunify.rateArtist('Eminem', 'ku4e');
-            sofunify.rateArtist('Eminem', 20);
-            let nanrate = sofunify.rateArtist('Eminem', 1);
-            expect(nanrate).to.equal(0);
-        })
-        it('rates right', function () {
-            let sofunify = new SoftUniFy();
-            sofunify.downloadSong('Eminem', 'Venom', 'Knock, Knock let the devil in...');
-            sofunify.rateArtist('Eminem');
-            sofunify.rateArtist('Eminem', 2);
-            let rate = sofunify.rateArtist('Eminem', 4);
-            expect(rate).to.equal(3);
+        it('findsProducer', () => {
+            let filmStudio = new FilmStudio('SU-Studio');
+            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+            let film = 'The Avengers';
+            let findsProducer = filmStudio.lookForProducer(film);
+            let filmOutput = `Film name: ${film}\nCast:\n`;
+            Object.keys(filmStudio.films[0].filmRoles).forEach((role) => {
+                filmOutput += `${filmStudio.films[0].filmRoles[role].actor} as ${filmStudio.films[0].filmRoles[role].role}\n`;
+            });
+            expect(findsProducer).to.equal(filmOutput);
         })
     })
 })
+
+let filmStudio = new FilmStudio('SU-Studio');
+filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+// let actor = 'RDJ';
+// let role = 'Iron-Man';
+// let roleTaken = filmStudio.casting(actor, role);
+
+console.log(filmStudio.lookForProducer('The Avengers'));
+// console.log(filmStudio.lookForProducer('The Scavengers'));
+
+
+// let filmStudio = new FilmStudio('SU-Studio');
+// console.log(filmStudio.casting('', 'Iron-Ma'));
+// filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
+// filmStudio.makeMovie('The New Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy', 'Black Panther']);
