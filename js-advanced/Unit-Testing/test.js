@@ -1,109 +1,121 @@
-const { expect } = require('chai');
-const FilmStudio = require('./filmStudio');
+const expect = require('chai').expect;
+const AutoService = require('./AutoService');
 
-describe('FilmStudio', () => {
-
-    it('constructs', () => {
-        let filmStudio = new FilmStudio('SU-Studio');
-        expect(filmStudio).to.be.an.instanceOf(FilmStudio);
-        expect(filmStudio.name).to.be.equal('SU-Studio');
-        expect(filmStudio.films).to.be.eql([]);
+describe('AutoService', () => {
+    it('constructor', () => {
+        let num = 2
+        let autoService = new AutoService(num);
+        expect(autoService).to.be.instanceOf(AutoService);
+        expect(autoService.garageCapacity).to.equal(num);
+        expect(autoService.workInProgress).to.be.instanceOf(Array);
+        expect(autoService.backlogWork).to.be.instanceOf(Array);
     })
-
-    describe('makeMovie', () => {
-        it('invalid parameters', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            let wrongTypes = () => filmStudio.makeMovie(3, 'array');
-            expect(wrongTypes).to.throw('Invalid arguments');
-        })
-        it('only one parameter', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            let singleParameter = () => filmStudio.makeMovie('movie name');
-            expect(singleParameter).to.throw('Invalid arguments count');
-        })
-        it('makes movie', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            let film = filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            expect(film).to.eql({
-                filmName: 'The Avengers',
-                filmRoles:
-                    [{ role: 'Iron-Man', actor: false },
-                    { role: 'Thor', actor: false },
-                    { role: 'Hulk', actor: false },
-                    { role: 'Arrow guy', actor: false }]
-            });
-            let filmName = filmStudio.films[0].filmName;
-            let rolesArray = filmStudio.films[0].filmRoles.length;
-            expect(filmName).to.equal('The Avengers');
-            expect(rolesArray).to.equal(4);
-        })
-        it('makes sequel', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            let sequel = filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Hulk', 'Arrow guy', 'Ant-man']);
-            expect(sequel.filmName).to.equal('The Avengers 2');
-            expect(filmStudio.films.length).to.equal(2);
-        })
+    it('availableSpace', () => {
+        let autoService = new AutoService(4);
+        autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+        autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+        autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+        let availableSpace = autoService.availableSpace;
+        expect(availableSpace).to.equal(1);
     })
-
-    describe('casting', () => {
-        it('empty films list', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            let emptyStudio = filmStudio.casting('Pesho', 'The big boss');
-            expect(emptyStudio).to.equal(`There are no films yet in ${filmStudio.name}.`)
+    describe('signUpForReview', () => {
+        it('adds an entry', () => {
+            let autoService = new AutoService(2);
+            let clientName = 'Peter';
+            let plateNumber = 'CA1234CA';
+            let carInfo = { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' };
+            autoService.signUpForReview(clientName, plateNumber, carInfo);
+            expect(autoService.workInProgress.length).to.equal(1);
+            expect(autoService.workInProgress[0].clientName).to.equal(clientName);
+            expect(autoService.workInProgress[0].plateNumber).to.equal(plateNumber);
+            expect(autoService.workInProgress[0].carInfo).to.eql(carInfo);
         });
-        it('can not find the role', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            let actor = 'Leo DiCaprio';
-            let role = 'Pikachu';
-            let missingRole = filmStudio.casting(actor, role);
-            expect(missingRole).to.equal(`${actor}, we cannot find a ${role} role...`)
-        })
-        it('tales the role', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            let actor = 'RDJ';
-            let role = 'Iron-Man';
-            let roleTaken = filmStudio.casting(actor, role);
-            expect(roleTaken).to.equal(`You got the job! Mr. ${actor} you are next ${role} in the The Avengers. Congratz!`);
-            expect(filmStudio.films[0].filmRoles).to.deep.include({ role: 'Iron-Man', actor: 'RDJ' });
+        it('adds multiple', () => {
+            let autoService = new AutoService(2);
+            let clientName = 'Philip';
+            let plateNumber = 'PB4321PB';
+            let carInfo = { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' }
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+            autoService.signUpForReview(clientName, plateNumber, carInfo);
+            expect(autoService.workInProgress.length).to.equal(2);
+            expect(autoService.backlogWork.length).to.equal(1);
+            expect(autoService.backlogWork[0].clientName).to.equal(clientName);
+            expect(autoService.backlogWork[0].plateNumber).to.equal(plateNumber);
+            expect(autoService.backlogWork[0].carInfo).to.eql(carInfo);
+
         })
     })
-
-    describe('lookForProducer', () => {
-        it('throws error', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            let film = 'The Scavengers';
-            let errorMessage = () => filmStudio.lookForProducer(film);
-            expect(errorMessage).to.throw(Error, `${film} do not exist yet, but we need the money...`)
+    describe('carInfo', () => {
+        it('cant find car', () => {
+            let autoService = new AutoService(2);
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+            let plateNumber = 'CA1234CA';
+            let clientName = 'Philip';
+            let noCar = autoService.carInfo(plateNumber, clientName);
+            expect(noCar).to.equal(`There is no car with platenumber ${plateNumber} and owner ${clientName}.`)
+        })
+        it('can find1', () => {
+            let autoService = new AutoService(2);
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+            let plateNumber = 'PB4321PB';
+            let clientName = 'Philip';
+            let car = autoService.carInfo(plateNumber, clientName);
+            expect(car.plateNumber).to.equal(plateNumber);
+            expect(car.clientName).to.equal(clientName);
+            expect(car.carInfo).to.eql({ 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
         });
-        it('findsProducer', () => {
-            let filmStudio = new FilmStudio('SU-Studio');
-            filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-            let film = 'The Avengers';
-            let findsProducer = filmStudio.lookForProducer(film);
-            let filmOutput = `Film name: ${film}\nCast:\n`;
-            Object.keys(filmStudio.films[0].filmRoles).forEach((role) => {
-                filmOutput += `${filmStudio.films[0].filmRoles[role].actor} as ${filmStudio.films[0].filmRoles[role].role}\n`;
-            });
-            expect(findsProducer).to.equal(filmOutput);
+        it('can find2', () => {
+            let autoService = new AutoService(2);
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+            let plateNumber = 'CA1234CA';
+            let clientName = 'Peter';
+            let car = autoService.carInfo(plateNumber, clientName);
+            expect(car.plateNumber).to.equal(plateNumber);
+            expect(car.clientName).to.equal(clientName);
+            expect(car.carInfo).to.eql({ 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+        })
+    })
+    describe('repairCar', () => {
+        it('empty autoservice', () => {
+            let autoService = new AutoService(2);
+            let chillin = autoService.repairCar();
+            expect(chillin).to.equal('No clients, we are just chilling...');
+        });
+        it('nothing to repair', () => {
+            let autoService = new AutoService(2);
+            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+            let fineCar = autoService.repairCar();
+            expect(fineCar).to.equal('Your car was fine, nothing was repaired.');
+        });
+        it('repairs', () => {
+            let autoService = new AutoService(2);
+            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+            let repair = autoService.repairCar();
+            expect(autoService.workInProgress.length).to.equal(0);
+            expect(repair).to.equal('Your doors and wheels and tires were repaired.');
         })
     })
 })
 
-let filmStudio = new FilmStudio('SU-Studio');
-filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-// let actor = 'RDJ';
-// let role = 'Iron-Man';
-// let roleTaken = filmStudio.casting(actor, role);
+let autoService = new AutoService(2);
+autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
+autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
+// console.log(autoService.carInfo('PB4321PB', 'Philip'));
 
-console.log(filmStudio.lookForProducer('The Avengers'));
-// console.log(filmStudio.lookForProducer('The Scavengers'));
+// console.log(autoService.repairCar());
+// console.log(autoService.availableSpace);
+
+// console.log(autoService);
+// console.log(autoService.repairCar());
+// console.log(autoService.repairCar());
+// console.log(autoService);
 
 
-// let filmStudio = new FilmStudio('SU-Studio');
-// console.log(filmStudio.casting('', 'Iron-Ma'));
-// filmStudio.makeMovie('The Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy']);
-// filmStudio.makeMovie('The New Avengers', ['Iron-Man', 'Thor', 'Hulk', 'Arrow guy', 'Black Panther']);
