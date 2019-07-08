@@ -1,121 +1,123 @@
 const expect = require('chai').expect;
-const AutoService = require('./AutoService');
+const PizzUni = require('./PizzUni');
 
-describe('AutoService', () => {
+describe('PizzUni', () => {
+    let pizza;
+    beforeEach(() => {
+        pizza = new PizzUni();
+    })
+
     it('constructor', () => {
-        let num = 2
-        let autoService = new AutoService(num);
-        expect(autoService).to.be.instanceOf(AutoService);
-        expect(autoService.garageCapacity).to.equal(num);
-        expect(autoService.workInProgress).to.be.instanceOf(Array);
-        expect(autoService.backlogWork).to.be.instanceOf(Array);
-    })
-    it('availableSpace', () => {
-        let autoService = new AutoService(4);
-        autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-        autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-        autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-        let availableSpace = autoService.availableSpace;
-        expect(availableSpace).to.equal(1);
-    })
-    describe('signUpForReview', () => {
-        it('adds an entry', () => {
-            let autoService = new AutoService(2);
-            let clientName = 'Peter';
-            let plateNumber = 'CA1234CA';
-            let carInfo = { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' };
-            autoService.signUpForReview(clientName, plateNumber, carInfo);
-            expect(autoService.workInProgress.length).to.equal(1);
-            expect(autoService.workInProgress[0].clientName).to.equal(clientName);
-            expect(autoService.workInProgress[0].plateNumber).to.equal(plateNumber);
-            expect(autoService.workInProgress[0].carInfo).to.eql(carInfo);
+        expect(pizza).to.be.instanceOf(PizzUni);
+        expect(pizza.registeredUsers).to.be.instanceOf(Array);
+        expect(pizza.orders).to.be.instanceOf(Array);
+        let availableProducts = {
+            pizzas: ['Italian Style', 'Barbeque Classic', 'Classic Margherita'],
+            drinks: ['Coca-Cola', 'Fanta', 'Water']
+        };
+        expect(pizza.availableProducts).to.eql(availableProducts);
+    });
+
+    describe('registerUser', () => {
+        it('registers', () => {
+            let email = 'a@b.c';
+            pizza.registerUser(email);
+            let user = {
+                email,
+                orderHistory: []
+            }
+            expect(pizza.registeredUsers[0]).to.eql(user);
         });
-        it('adds multiple', () => {
-            let autoService = new AutoService(2);
-            let clientName = 'Philip';
-            let plateNumber = 'PB4321PB';
-            let carInfo = { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' }
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-            autoService.signUpForReview(clientName, plateNumber, carInfo);
-            expect(autoService.workInProgress.length).to.equal(2);
-            expect(autoService.backlogWork.length).to.equal(1);
-            expect(autoService.backlogWork[0].clientName).to.equal(clientName);
-            expect(autoService.backlogWork[0].plateNumber).to.equal(plateNumber);
-            expect(autoService.backlogWork[0].carInfo).to.eql(carInfo);
+
+        it('returns', () => {
+            let email = 'a@b.c';
+            let newUser = pizza.registerUser(email);
+            let user = {
+                email,
+                orderHistory: []
+            }
+            expect(newUser).to.eql(user);
+        });
+
+        it('throws error', () => {
+            let email = 'a@b.c'
+            pizza.registerUser(email);
+            let error = () => pizza.registerUser(email);
+            expect(error).to.throw(`This email address (${email}) is already being used!`);
+        })
+    })
+
+    describe('makeAnOrder', () => {
+        beforeEach(() => {
+            pizza.registerUser('a@b.c');
+            pizza.registerUser('d@e.f');
+        })
+
+        it('invalid user', () => {
+            let error = () => pizza.makeAnOrder('asd@sa.bg', 'Italian Style', 'Water');
+            expect(error).to.throw('You must be registered to make orders!');
+        });
+
+        it('invalid pizza', () => {
+            let error = () => pizza.makeAnOrder('a@b.c', 'pizz', 'Water');
+            expect(error).to.throw('You must order at least 1 Pizza to finish the order.');
+        });
+
+        it('orders without valid drink', () => {
+            let order = pizza.makeAnOrder('a@b.c', 'Italian Style', 'limonada');
+            let orderObj = {
+                orderedPizza: 'Italian Style',
+                email: 'a@b.c',
+                status: 'pending'
+            }
+            expect(order).to.equal(0);
+            expect(pizza.orders[0]).to.eql(orderObj);
+            expect(pizza.registeredUsers[0].orderHistory[0]).to.eql({ orderedPizza: 'Italian Style' });
 
         })
-    })
-    describe('carInfo', () => {
-        it('cant find car', () => {
-            let autoService = new AutoService(2);
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-            let plateNumber = 'CA1234CA';
-            let clientName = 'Philip';
-            let noCar = autoService.carInfo(plateNumber, clientName);
-            expect(noCar).to.equal(`There is no car with platenumber ${plateNumber} and owner ${clientName}.`)
-        })
-        it('can find1', () => {
-            let autoService = new AutoService(2);
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-            let plateNumber = 'PB4321PB';
-            let clientName = 'Philip';
-            let car = autoService.carInfo(plateNumber, clientName);
-            expect(car.plateNumber).to.equal(plateNumber);
-            expect(car.clientName).to.equal(clientName);
-            expect(car.carInfo).to.eql({ 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-        });
-        it('can find2', () => {
-            let autoService = new AutoService(2);
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-            let plateNumber = 'CA1234CA';
-            let clientName = 'Peter';
-            let car = autoService.carInfo(plateNumber, clientName);
-            expect(car.plateNumber).to.equal(plateNumber);
-            expect(car.clientName).to.equal(clientName);
-            expect(car.carInfo).to.eql({ 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
+
+        it('orders with a drink', () => {
+            pizza.makeAnOrder('a@b.c', 'Italian Style', 'limonada');
+            let order = pizza.makeAnOrder('a@b.c', 'Italian Style', 'Water');
+            let orderObj = {
+                orderedPizza: 'Italian Style',
+                orderedDrink: 'Water',
+                email: 'a@b.c',
+                status: 'pending'
+            }
+
+            expect(order).to.equal(1);
+            expect(pizza.orders[1]).to.eql(orderObj);
+            expect(pizza.registeredUsers[0].orderHistory[1]).to.eql({ orderedPizza: 'Italian Style', orderedDrink: 'Water' });
         })
     })
-    describe('repairCar', () => {
-        it('empty autoservice', () => {
-            let autoService = new AutoService(2);
-            let chillin = autoService.repairCar();
-            expect(chillin).to.equal('No clients, we are just chilling...');
-        });
-        it('nothing to repair', () => {
-            let autoService = new AutoService(2);
-            autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-            let fineCar = autoService.repairCar();
-            expect(fineCar).to.equal('Your car was fine, nothing was repaired.');
-        });
-        it('repairs', () => {
-            let autoService = new AutoService(2);
-            autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-            let repair = autoService.repairCar();
-            expect(autoService.workInProgress.length).to.equal(0);
-            expect(repair).to.equal('Your doors and wheels and tires were repaired.');
-        })
+
+    it('completeOrder', () => {
+        pizza.registerUser('a@b.c');
+        pizza.registerUser('d@e.f');
+        pizza.makeAnOrder('a@b.c', 'Italian Style', 'limonada');
+        let complete = pizza.completeOrder();
+        let orderObj = {
+            orderedPizza: 'Italian Style',
+            email: 'a@b.c',
+            status: 'completed'
+        }
+
+        expect(complete).to.eql(orderObj);
+        expect(pizza.orders[0]).to.equal(complete);
+    })
+
+    it('details order', () => {
+        pizza.registerUser('a@b.c');
+        pizza.registerUser('d@e.f');
+        pizza.makeAnOrder('a@b.c', 'Italian Style', 'limonada');
+        pizza.makeAnOrder('d@e.f', 'Italian Style', 'Water');
+        pizza.completeOrder();
+        let first = pizza.detailsAboutMyOrder(0);
+        let second = pizza.detailsAboutMyOrder(1);
+        let third = pizza.detailsAboutMyOrder(2);
+        expect(first).to.equal('Status of your order: completed');
+        expect(second).to.equal('Status of your order: pending');
+        expect(third).to.equal(undefined);
     })
 })
-
-let autoService = new AutoService(2);
-autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken' });
-autoService.signUpForReview('Peter', 'CA1234CA', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'doors': 'broken', 'wheels': 'broken', 'tires': 'broken' });
-autoService.signUpForReview('Philip', 'PB4321PB', { 'engine': 'MFRGG23', 'transmission': 'FF4418ZZ', 'exaustPipe': 'REMUS' });
-// console.log(autoService.carInfo('PB4321PB', 'Philip'));
-
-// console.log(autoService.repairCar());
-// console.log(autoService.availableSpace);
-
-// console.log(autoService);
-// console.log(autoService.repairCar());
-// console.log(autoService.repairCar());
-// console.log(autoService);
-
-
