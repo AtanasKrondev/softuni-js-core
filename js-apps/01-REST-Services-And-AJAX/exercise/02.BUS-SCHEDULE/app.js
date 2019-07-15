@@ -7,7 +7,7 @@ function solve() {
         const url = baseUrl + currentStopId + '.json';
 
         fetch(url)
-            .then(requet => requet.json())
+            .then(request => request.json())
             .then((data) => loadStop(data))
     }
 

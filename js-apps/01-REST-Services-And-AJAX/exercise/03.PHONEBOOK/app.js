@@ -45,11 +45,12 @@ function attachEvents() {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            }).then(() => {
-                loadPhonebook();
-                document.getElementById('person').value = '';
-                document.getElementById('phone').value = '';
-            });
+            })
+                .then(() => {
+                    document.getElementById('person').value = '';
+                    document.getElementById('phone').value = '';
+                })
+                .then(() => loadPhonebook());
         }
     }
 

@@ -12,7 +12,8 @@ function attachEvents() {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            }).then(() => refresh())
+            })
+                .then(() => refresh())
                 .then(() => {
                     document.getElementById('author').value = '';
                     document.getElementById('content').value = '';
