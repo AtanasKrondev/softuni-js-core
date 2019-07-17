@@ -19,6 +19,7 @@ function attachEvents() {
 
 
     function loadWeatherInfo() {
+        elements.forecast.style.display = 'block';
         fetch('https://judgetests.firebaseio.com/locations.json')
             .then(handler)
             .then(loadLocationWeatherInfo);
@@ -27,9 +28,15 @@ function attachEvents() {
     function loadLocationWeatherInfo(data) {
         const location = data.filter(loc => loc.name === elements.inputField.value)[0];
 
-        fetch(`https://judgetests.firebaseio.com/forecast/today/${location.code}.json`)
-            .then(handler)
-            .then(data => showLocationWeatherInfo(data, location.code));
+        if (location) {
+            // elements.forecast.innerHTML = '<div id="current"><div class="label">Current conditions</div></div><div id="upcoming"><div class="label">Three-day forecast</div></div>'
+            fetch(`https://judgetests.firebaseio.com/forecast/today/${location.code}.json`)
+                .then(handler)
+                .then(data => showLocationWeatherInfo(data, location.code));
+        } else {
+            elements.current.innerHTML = '<div class="label">Error</div>';
+            elements.upcoming.innerHTML = '';
+        }
 
     }
 
@@ -82,8 +89,10 @@ function attachEvents() {
     }
 
     function handler(response) {
-        if (response.status > 400) {
-            throw new Error(`Something went wrong. Error: ${response.statusText}`)
+        if (response.status >= 400) {
+            elements.current.innerHTML = '<div class="label">Error</div>';
+            elements.upcoming.innerHTML = '';
+            throw new Error(`Something went wrong. Error: ${response.statusText}`);
         }
 
         return response.json();
