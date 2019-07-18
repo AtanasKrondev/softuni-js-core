@@ -66,16 +66,21 @@
                     return a;
                 }, {})
 
-            const headers = {
-                method: 'PUT',
-                body: JSON.stringify(body)
-            };
+            if (!(Object.values(body).indexOf('') > -1)) {
 
-            fetch(`https://fisher-game.firebaseio.com/catches/${catchId}.json`, headers)
-                .then(handler)
-                .then((data) => {
-                    elements.loadBtn.click();
-                })
+                const headers = {
+                    method: 'PUT',
+                    body: JSON.stringify(body)
+                };
+
+                fetch(`https://fisher-game.firebaseio.com/catches/${catchId}.json`, headers)
+                    .then(handler)
+                    .then((data) => {
+                        elements.loadBtn.click();
+                    })
+            } else {
+                alert('Input fields should not be empty!');
+            }
         }
     }
 
@@ -86,19 +91,24 @@
             .reduce((a, c) => {
                 const prop = c.className;
                 a[prop] = c.value;
+                c.value = '';
                 return a;
             }, {})
 
-        const headers = {
-            method: 'POST',
-            body: JSON.stringify(body),
-        }
+        if (!(Object.values(body).indexOf('') > -1)) {
+            const headers = {
+                method: 'POST',
+                body: JSON.stringify(body),
+            }
 
-        fetch('https://fisher-game.firebaseio.com/catches.json', headers)
-            .then(handler)
-            .then((data) => {
-                elements.loadBtn.click();
-            })
+            fetch('https://fisher-game.firebaseio.com/catches.json', headers)
+                .then(handler)
+                .then((data) => {
+                    elements.loadBtn.click();
+                })
+        } else {
+            alert('Input fields should not be empty!');
+        }
     }
 
     function handler(response) {
