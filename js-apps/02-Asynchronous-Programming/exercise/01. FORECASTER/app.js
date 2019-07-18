@@ -29,7 +29,6 @@ function attachEvents() {
         const location = data.filter(loc => loc.name === elements.inputField.value)[0];
 
         if (location) {
-            // elements.forecast.innerHTML = '<div id="current"><div class="label">Current conditions</div></div><div id="upcoming"><div class="label">Three-day forecast</div></div>'
             fetch(`https://judgetests.firebaseio.com/forecast/today/${location.code}.json`)
                 .then(handler)
                 .then(data => showLocationWeatherInfo(data, location.code));

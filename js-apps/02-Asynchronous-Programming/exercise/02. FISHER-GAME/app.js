@@ -1,16 +1,15 @@
 (() => {
     const elements = {
         loadBtn: document.querySelector('button.load'),
-        createBtn: document.querySelector('button.create'),
+        createBtn: document.querySelector('button.add'),
         catches: document.getElementById('catches'),
     }
 
-    elements.catches.children[0].style.display = 'none';
+    const pattern = elements.catches.children[0];
+    pattern.style.display = 'none';
 
     elements.loadBtn.addEventListener('click', loadAllCatches);
-    // elements.createBtn.addEventListener('click', createCatch);
-    // elements.updateBtn.addEventListener('click', updateCatch);
-    // elements.deleteBtn.addEventListener('click', deleteCatch);
+    elements.createBtn.addEventListener('click', createCatch);
 
     function loadAllCatches() {
         fetch('https://fisher-game.firebaseio.com/catches.json', { method: 'GET' })
@@ -19,8 +18,11 @@
     }
 
     function showAllCatches(data) {
+        elements.catches.innerHTML = '';
+
         Object.keys(data).forEach((key) => {
-            const catchElement = elements.catches.children[0].cloneNode(true);
+            const catchElement = pattern.cloneNode(true);
+
             catchElement.style.display = 'inline-block';
 
             catchElement.setAttribute('data-id', key);
@@ -54,7 +56,6 @@
 
         function updateCatch(event) {
             const catchId = event.currentTarget.parentNode.getAttribute('data-id');
-            console.log(catchId)
             const catchElement = event.currentTarget.parentNode;
 
             const body = [...catchElement.children]
@@ -64,8 +65,6 @@
                     a[prop] = c.value;
                     return a;
                 }, {})
-            console.log(body);
-
 
             const headers = {
                 method: 'PUT',
@@ -75,36 +74,31 @@
             fetch(`https://fisher-game.firebaseio.com/catches/${catchId}.json`, headers)
                 .then(handler)
                 .then((data) => {
-                    console.log(data);
                     elements.loadBtn.click();
                 })
         }
     }
 
     function createCatch() {
+        const catchElement = document.querySelector('fieldset#addForm');
+        const body = [...catchElement.children]
+            .filter(el => el.tagName === 'INPUT')
+            .reduce((a, c) => {
+                const prop = c.className;
+                a[prop] = c.value;
+                return a;
+            }, {})
 
-    }
-
-
-
-    function createHTMLElement(tagName, className, textContent, attribute) {
-        const currentElement = document.createElement(tagName);
-
-        if (typeof className === 'string') {
-            currentElement.classList.add(className);
-        } else if (typeof className === 'object') {
-            currentElement.classList.add(...className);
+        const headers = {
+            method: 'POST',
+            body: JSON.stringify(body),
         }
 
-        if (textContent) {
-            currentElement.textContent = textContent;
-        }
-
-        if (attribute) {
-            currentElement.setAttribute(attribute.name, attribute.value);
-        }
-
-        return currentElement;
+        fetch('https://fisher-game.firebaseio.com/catches.json', headers)
+            .then(handler)
+            .then((data) => {
+                elements.loadBtn.click();
+            })
     }
 
     function handler(response) {
