@@ -5,13 +5,14 @@
     const appSecret = '9653bcd3866b4c64b0fbe5659145cf7a';
     const baseUrl = `https://baas.kinvey.com/appdata/${appKey}/students`;
 
-    const elemenets = {
+    const elements = {
         tbody: document.querySelector('tbody'),
         table: document.getElementById('results'),
-        theader: document.querySelector('thead tr')
+        theader: document.querySelector('thead tr'),
+        createBtn: createHTMLElement('td', null, 'button', null, 'CREATE'),
     };
 
-    elemenets.theader.appendChild(createHTMLElement('th','action'));
+    elements.theader.appendChild(createHTMLElement('th', 'Action'));
 
     const studentProperties = ['ID', 'First Name', 'Last Name', 'Faculty Number', 'Grade'];
 
@@ -20,16 +21,19 @@
 
     function createFooter() {
         const tfoot = document.createElement('tfoot');
-        elemenets.table.appendChild(tfoot)
+        elements.table.appendChild(tfoot)
         const footRow = document.createElement('tr')
         tfoot.appendChild(footRow);
         for (const property of studentProperties) {
             footRow.appendChild(createHTMLElement('td', null, 'input', property))
         }
-
+        footRow.appendChild(elements.createBtn);
+        elements.createBtn.addEventListener('click', createStudent);
     }
 
     function loadStudents() {
+        elements.tbody.innerHTML = '<p>LOADING DATA...</p>';
+
         const headers = {
             credentials: 'include',
             Authorization: 'Kinvey' + localStorage.getItem('authToken'),
@@ -41,20 +45,26 @@
     }
 
     function showStudents(data) {
-        const students = data.sort((a, b) => a.id - b.id);
+        elements.tbody.innerHTML = '';
+        const students = data.sort((a, b) => a['ID'] - b['ID']);
         students.forEach(student => {
             const row = document.createElement('tr');
 
             for (const property of studentProperties) {
                 row.appendChild(createHTMLElement('td', student[property]))
             }
-
-            elemenets.tbody.appendChild(row);
-        })
+            row.appendChild(createHTMLElement('td', null, 'button', null, 'DELETE'));
+            elements.tbody.appendChild(row);
+        });
 
     }
 
-    function createHTMLElement(tag, text, childTag, placeholder) {
+    function createStudent() {
+        const inputFields = [...document.getElementsByTagName('input')];
+        inputFields.forEach(input => console.log(input.value));
+    }
+
+    function createHTMLElement(tag, text, childTag, placeholder, childText) {
         const element = document.createElement(tag);
         if (text) {
             element.textContent = text;
@@ -63,6 +73,9 @@
             const childElement = document.createElement(childTag);
             if (placeholder) {
                 childElement.placeholder = placeholder;
+            }
+            if (childText) {
+                childElement.textContent = childText;
             }
             element.appendChild(childElement);
         }
