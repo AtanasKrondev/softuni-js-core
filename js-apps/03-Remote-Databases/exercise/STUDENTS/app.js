@@ -17,6 +17,11 @@
     const studentProperties = ['ID', 'First Name', 'Last Name', 'Faculty Number', 'Grade'];
 
     createFooter();
+    const [id, firstName, lastName, facultyNumber, grade] = [...document.getElementsByTagName('input')];
+    id.setAttribute('type', 'number');
+    facultyNumber.setAttribute('type', 'number');
+    grade.setAttribute('type', 'number');
+
     loadStudents();
 
     function createFooter() {
@@ -60,8 +65,32 @@
     }
 
     function createStudent() {
-        const inputFields = [...document.getElementsByTagName('input')];
-        inputFields.forEach(input => console.log(input.value));
+        if (id.value && firstName.value && lastName.value && facultyNumber.value && grade.value) {
+            const data = {
+                'ID': id.value,
+                'First Name': firstName.value,
+                'Last Name': lastName.value,
+                'Faculty Number': facultyNumber.value,
+                'Grade': grade.value
+            }
+
+            const headers = {
+                method: "POST",
+                body: JSON.stringify(data),
+                credentials: 'include',
+                Authorization: 'Basic ' + btoa(`${appKey}:${appSecret}`),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            };
+
+            fetch(baseUrl, headers)
+                .then(handler)
+                .then(loadStudents)
+
+        } else {
+            alert('Invalid input');
+        }
     }
 
     function createHTMLElement(tag, text, childTag, placeholder, childText) {
