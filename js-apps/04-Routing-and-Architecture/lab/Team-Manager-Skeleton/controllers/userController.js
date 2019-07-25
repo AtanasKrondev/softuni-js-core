@@ -4,7 +4,7 @@ const userController = function () {
             header: '../views/common/header.hbs',
             footer: '../views/common/footer.hbs',
             registerForm: './views/register/registerForm.hbs'
-        }).then(function(){
+        }).then(function () {
             this.partial('../views/register/registerPage.hbs')
         })
     };
@@ -14,16 +14,22 @@ const userController = function () {
             header: '../views/common/header.hbs',
             footer: '../views/common/footer.hbs',
             loginForm: './views/login/loginForm.hbs'
-        }).then(function(){
+        }).then(function () {
             this.partial('../views/login/loginPage.hbs')
         })
     };
 
-    const postRegister = function () { };
+    const postRegister = function (context) {
+        userModel.register(context.params);
+    };
+    const postLogin = function () {
+        console.log('login')
+    };
 
     return {
         getRegister,
         postRegister,
         getLogin,
+        postLogin
     }
 }();
