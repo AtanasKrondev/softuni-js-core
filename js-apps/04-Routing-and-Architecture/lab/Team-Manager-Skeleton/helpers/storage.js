@@ -7,7 +7,7 @@ const storage = function () {
     };
 
     const saveData = function (key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
+        localStorage.setItem(key + appKey, JSON.stringify(value));
     }
 
     const saveUser = function (data) {
@@ -16,11 +16,13 @@ const storage = function () {
     };
 
     const deleteUser = function () {
-        localStorage.removeItem('userInfo');
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('userInfo' + appKey);
+        localStorage.removeItem('authToken' + appKey);
     }
 
     return {
+        appKey,
+        appSecret,
         getData,
         saveData,
         saveUser,

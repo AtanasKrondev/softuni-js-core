@@ -20,16 +20,36 @@ const userController = function () {
     };
 
     const postRegister = function (context) {
-        userModel.register(context.params);
+        userModel.register(context.params)
+            .then(helper.handler)
+            .then(data => {
+                storage.saveUser(data);
+                context.redirect('#/home');
+            })
     };
-    const postLogin = function () {
-        console.log('login')
+    const postLogin = function (context) {
+        userModel.login(context.params)
+            .then(helper.handler)
+            .then(data => {
+                storage.saveUser(data);
+                homeController.getHome(context);
+            })
+    };
+
+    const logout = function (context) {
+        userModel.logout()
+            .then(data => {
+                storage.deleteUser();
+                homeController.getHome(context);
+                console.log(data);
+            })
     };
 
     return {
         getRegister,
         postRegister,
         getLogin,
-        postLogin
+        postLogin,
+        logout,
     }
 }();

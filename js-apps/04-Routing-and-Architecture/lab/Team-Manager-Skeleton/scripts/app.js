@@ -8,6 +8,7 @@ const app = Sammy('#main', function () {
 
     this.get('#/login', userController.getLogin);
     this.post('#/login', userController.postLogin);
+    this.get('#/logout', userController.logout);
 });
 
 (() => {
