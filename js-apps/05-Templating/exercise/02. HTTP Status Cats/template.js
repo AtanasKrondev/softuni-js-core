@@ -12,8 +12,15 @@
     }
 
     function showInfo() {
-        const moreInfo = event.target.parentNode.querySelector('div.status');
-        moreInfo.style.display === 'none' ? moreInfo.style.display = '' : moreInfo.style.display = 'none';
+        const clickedBtn = event.target;
+        const moreInfo = clickedBtn.parentNode.querySelector('div.status');
+        if (clickedBtn.textContent === 'Show status code') {
+            clickedBtn.textContent = 'Hide status code';
+            moreInfo.style.display = '';
+        } else if (clickedBtn.textContent === 'Hide status code') {
+            clickedBtn.textContent = 'Show status code';
+            moreInfo.style.display = 'none';
+        }
     }
 
 })()
