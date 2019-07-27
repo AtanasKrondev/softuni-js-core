@@ -6,7 +6,7 @@
         const towns = document.getElementById('towns')
             .value
             .split(', ')
-            .map(el => el = { name: el })
+            .map(el => ({ name: el }))
 
         renderTowns(towns);
     }
