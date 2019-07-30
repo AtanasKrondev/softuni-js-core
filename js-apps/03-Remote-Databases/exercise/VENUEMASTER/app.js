@@ -26,9 +26,9 @@
             element.venueInfo.innerHTML = '<b>LOADING VENUES...</b>';
             const headers = {
                 method: "POST",
-                credentials: 'include',
-                Authorization: 'Basic ' + btoa(`${user}:${password}`),
+                // credentials: 'include',
                 headers: {
+                    'Authorization': 'Basic ' + btoa(`${user}:${password}`),
                     "Content-type": "application/json"
                 }
             }
