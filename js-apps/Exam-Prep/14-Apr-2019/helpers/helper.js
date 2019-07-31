@@ -17,8 +17,40 @@ const helper = function () {
         return params.password === params.rePassword;
     };
 
+    const notify = function (type, textContent) {
+        let element = '';
+
+        switch (type) {
+            case 'success':
+                element = document.getElementById('successBox');
+                element.textContent = textContent;
+                element.addEventListener('click', (event) => event.target.style.display = 'none');
+                break;
+            case 'error':
+                element = document.getElementById('errorBox');
+                element.textContent = textContent;
+                element.addEventListener('click', (event) => event.target.style.display = 'none');
+                break;
+            case 'loading':
+                element = document.getElementById('loadingBox');
+                element.textContent = 'Loading...';
+                break;
+        }
+
+        element.style.display = 'block';
+    }
+
+    const stopNotify = function () {
+        [...document.getElementById('notifications').children]
+            .forEach((child) => {
+                child.style.display = 'none';
+            })
+    }
+
     return {
         handler,
-        passwordCheck
+        passwordCheck,
+        notify,
+        stopNotify
     }
 }();

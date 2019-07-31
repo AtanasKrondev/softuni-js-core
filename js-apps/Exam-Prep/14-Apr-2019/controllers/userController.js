@@ -31,9 +31,13 @@ const userController = function () {
 
     const postLogin = function (context) {
 
+        helper.notify('loading')
+
         userModel.login(context.params)
             .then(helper.handler)
             .then((data) => {
+                helper.stopNotify();
+                helper.notify('success', 'You just logged in!');
                 storage.saveUser(data);
                 homeController.getHome(context);
             })

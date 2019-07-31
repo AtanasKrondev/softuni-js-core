@@ -25,7 +25,7 @@ const eventModel = function () {
         return requester.get(url, headers);
     }
 
-    const getEvent = function(id){
+    const getEvent = function (id) {
         let url = `/appdata/${storage.appKey}/events/${id}`;
         let headers = {
             headers: {}
@@ -34,9 +34,29 @@ const eventModel = function () {
         return requester.get(url, headers);
     }
 
+    const ediEvent = function (params) {
+        let url = `/appdata/${storage.appKey}/events/${params.eventId}`;
+        delete params.eventId;
+        let headers = {
+            body: JSON.stringify({ ...params }),
+            headers: {}
+        }
+        return requester.put(url, headers);
+    }
+
+    const deleteEvent = function (id) {
+        let url = `/appdata/${storage.appKey}/events/${id}`;
+        let headers = {
+            headers: {}
+        }
+        return requester.del(url, headers);
+    }
+
     return {
         createEvent,
         getAllEvents,
-        getEvent
+        getEvent,
+        ediEvent,
+        deleteEvent
     }
 }();

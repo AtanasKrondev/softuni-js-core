@@ -48,7 +48,7 @@ const eventController = function () {
         })
     }
 
-    const getEditEvent = async function(context){
+    const getEditEvent = async function (context) {
         const loggedIn = storage.getData('userInfo') !== null;
 
         if (loggedIn) {
@@ -68,10 +68,28 @@ const eventController = function () {
         })
     }
 
+    const postEditEvent = function (context) {
+        eventModel.ediEvent(context.params)
+            .then(helper.handler)
+            .then(data => {
+                homeController.getHome(context);
+            })
+    }
+
+    const postDeleteEvent = function (context) {
+        eventModel.deleteEvent(context.params.eventId)
+            .then(helper.handler)
+            .then(data => {
+                homeController.getHome(context);
+            })
+    }
+
     return {
         getCreateEvent,
         postCreateEvent,
         getDetailsEvent,
-        getEditEvent
+        getEditEvent,
+        postEditEvent,
+        postDeleteEvent
     }
 }();
