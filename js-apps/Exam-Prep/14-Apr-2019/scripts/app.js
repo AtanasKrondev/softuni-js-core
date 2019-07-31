@@ -14,8 +14,10 @@ const app = Sammy("#rootElement", function () {
     this.get('#/logout', userController.logout);
 
     //Events
-    this.get('#/createEvent', eventController.getCreateEvent)
-    this.post('#/createEvent', eventController.postCreateEvent)
+    this.get('#/createEvent', eventController.getCreateEvent);
+    this.post('#/createEvent', eventController.postCreateEvent);
+    this.get('#/editEvent/:eventId', eventController.getEditEvent)
+    this.get('#/eventDetails/:eventId', eventController.getDetailsEvent)
     
 });
 
