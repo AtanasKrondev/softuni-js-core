@@ -1,5 +1,7 @@
 const userController = function () {
     const getRegister = function (context) {
+        helper.addHeaderInfo(context);
+
         context.loadPartials({
             header: './views/common/header.hbs',
             footer: './views/common/footer.hbs',
@@ -9,6 +11,8 @@ const userController = function () {
     };
 
     const getLogin = function (context) {
+        helper.addHeaderInfo(context);
+
         context.loadPartials({
             header: './views/common/header.hbs',
             footer: './views/common/footer.hbs',
@@ -28,6 +32,7 @@ const userController = function () {
             .then((data) => {
                 sessionStorage.setItem('username', data.username);
                 sessionStorage.setItem('authtoken', data._kmd.authtoken);
+                sessionStorage.setItem('userId', data._id);
 
                 context.redirect('#/home');
             })
@@ -44,6 +49,7 @@ const userController = function () {
             .then((data) => {
                 sessionStorage.setItem('username', data.username);
                 sessionStorage.setItem('authtoken', data._kmd.authtoken);
+                sessionStorage.setItem('userId', data._id);
 
                 context.redirect('#/home');
             })
