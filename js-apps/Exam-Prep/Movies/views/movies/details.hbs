@@ -2,16 +2,16 @@
 <div id="detailsMovie">
     <h1>Details</h1>
     <div class="movie">
-        <h2>Title: {{movie.title}}</h2>
+        <h2>Title: {{data.title}}</h2>
         <img
-            src="{{movie.imageUrl}}">
-        <p>{{movie.description}}</p>
+            src="{{data.imageUrl}}">
+        <p>{{data.description}}</p>
         <h2>Genres</h2>
         <ul class="genres">
-            <li>{{movie.genres}}</li>
+            <li>{{data.genres}}</li>
         </ul>
-        <p>Available Tickets: {{movie.tickets}}</p>
-        <button><a href="#/movie/buy/{{movie._id}}">Buy Ticket</a></button>
+        <p>Available Tickets: {{data.tickets}}</p>
+        <button><a href="#/movie/buy/{{data._id}}">Buy Ticket</a></button>
     </div>
 </div>
 

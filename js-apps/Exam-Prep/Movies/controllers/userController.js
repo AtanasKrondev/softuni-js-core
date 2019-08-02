@@ -2,23 +2,19 @@ const userController = function () {
     const getRegister = function (context) {
         helper.addHeaderInfo(context);
 
-        context.loadPartials({
-            header: './views/common/header.hbs',
-            footer: './views/common/footer.hbs',
-        }).then(function () {
-            this.partial('./views/auth/register.hbs');
-        })
+        helper.loadPartials(context)
+            .then(function () {
+                this.partial('./views/auth/register.hbs');
+            })
     };
 
     const getLogin = function (context) {
         helper.addHeaderInfo(context);
 
-        context.loadPartials({
-            header: './views/common/header.hbs',
-            footer: './views/common/footer.hbs',
-        }).then(function () {
-            this.partial('./views/auth/login.hbs');
-        })
+        helper.loadPartials(context)
+            .then(function () {
+                this.partial('./views/auth/login.hbs');
+            })
     };
 
     const postRegister = function (context) {

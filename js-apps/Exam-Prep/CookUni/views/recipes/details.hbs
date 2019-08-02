@@ -1,0 +1,32 @@
+{{>header}}
+<div class="row form-layout p-5">
+    <div class="col-md-12">
+        <div class="recepieInfo">
+            <div class="detailsFoodImage">
+                <img src="{{data.foodImageURL}}"
+                    alt="">
+            </div>
+
+            <div class="infoPack">
+                <h3 class="my-3">{{data.meal}}</h3>
+                <p class="prep-method">{{data.prepMethod}}</p>
+                <p class="description">{{data.description}}</p>
+            </div>
+            <div class="actions">
+                <a class="btn btn-danger" href="#/recipes/delete/{{data._id}}">Archive</a>
+                <a class="btn btn-info" href="#/recipes/edit/{{data._id}}">Edit</a>
+                <a class="btn btn-success" href="#/recipes/like/{{data._id}}"> {{data.likesCounter}} likes</a>
+            </div>
+        </div>
+
+        <div class="detailsIngredients">
+            <h3 class="my-3 ingredient">Ingredients</h3>
+            <ul>
+                {{#each data.ingredients}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>
+{{>footer}}

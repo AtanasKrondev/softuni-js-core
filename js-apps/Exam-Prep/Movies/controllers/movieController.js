@@ -2,12 +2,10 @@ const movieController = function () {
     const createGet = function (context) {
         helper.addHeaderInfo(context);
 
-        context.loadPartials({
-            header: './views/common/header.hbs',
-            footer: './views/common/footer.hbs',
-        }).then(function () {
-            this.partial('./views/movies/create.hbs');
-        })
+        helper.loadPartials(context)
+            .then(function () {
+                this.partial('./views/movies/create.hbs');
+            })
     }
 
     const createPost = function (context) {
@@ -30,13 +28,10 @@ const movieController = function () {
             .then(helper.handler)
             .then((movies) => {
                 context.movies = movies;
-                context.loadPartials({
-                    header: './views/common/header.hbs',
-                    footer: './views/common/footer.hbs',
-                    singleMovie: './views/movies/singleMovie.hbs'
-                }).then(function () {
-                    this.partial('./views/movies/cinema.hbs');
-                })
+                helper.loadPartials(context, { singleMovie: './views/movies/singleMovie.hbs' })
+                    .then(function () {
+                        this.partial('./views/movies/cinema.hbs');
+                    })
             })
 
     }
@@ -48,13 +43,10 @@ const movieController = function () {
             .then(helper.handler)
             .then((movies) => {
                 context.movies = movies;
-                context.loadPartials({
-                    header: './views/common/header.hbs',
-                    footer: './views/common/footer.hbs',
-                    myMoviesSingle: './views/movies/myMoviesSingle.hbs'
-                }).then(function () {
-                    this.partial('./views/movies/myMovies.hbs');
-                })
+                helper.loadPartials(context, { myMoviesSingle: './views/movies/myMoviesSingle.hbs' })
+                    .then(function () {
+                        this.partial('./views/movies/myMovies.hbs');
+                    })
             })
     }
 
